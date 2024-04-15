@@ -3,16 +3,27 @@ import { Dialog, Transition } from '@headlessui/react'
 import { getNewsFromWordPress } from '../services/news.service'
 import { NewModel } from '../models/new.mode'
 import { NewWordpressCard } from './NewWordpressCard'
+import { useStore } from '../global/store'
 
-export const TitleListNews = () => {
+export const TitleListNews = ({ firebaseNews }: { firebaseNews: NewModel[] }) => {
+    const { needUpdate, setNeedUpdateON } = useStore();
     const [news, setNews] = useState<NewModel[]>([])
 
     const [open, setOpen] = useState(false)
     const cancelButtonRef = useRef(null)
 
     useEffect(() => {
-        handleGetNewsFromWordPress();
-    }, []);
+        if (needUpdate || news.length === 0) {
+            handleGetNewsFromWordPress();
+        }
+    }, [needUpdate, news]);
+
+    useEffect(() => {
+        if (!open && news.length > 0) {
+            setNeedUpdateON();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [open]);
 
     const handleGetNewsFromWordPress = async () => {
         const result = await getNewsFromWordPress();
@@ -47,7 +58,7 @@ export const TitleListNews = () => {
                         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
                     </Transition.Child>
 
-                    <div className="fixed inset-0 z-10 w-full mt-16">
+                    <div className="fixed inset-0 z-10 max-w-6xl mt-16 mx-auto">
                         <div className="flex justify-center p-4 text-center sm:items-center sm:p-0">
                             <Transition.Child
                                 as={Fragment}
@@ -58,7 +69,7 @@ export const TitleListNews = () => {
                                 leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                             >
-                                <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all w-full mx-8 sm:mx-12 mt-16">
+                                <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all w-full mx-8 sm:mx-12 mt-8">
                                     <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                                         <div className="sm:flex sm:items-start">
                                             <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
@@ -70,12 +81,15 @@ export const TitleListNews = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="mt-2 overflow-y-scroll h-96">
-                                        <div className="text-sm text-gray-500">
+                                    <div className="mt-2 overflow-y-scroll h-[60vh] px-10">
+                                        <div className="text-sm text-gray-500 flex flex-wrap gap-4 justify-start">
                                             {
                                                 news.map((item: NewModel) => {
+                                                    if (!firebaseNews) return;
+                                                    const alreadyExist = firebaseNews.find((element) => element.id === item.id);
+                                                    const exist = alreadyExist ? true : false;
                                                     return (
-                                                        <NewWordpressCard key={item.id} item={item} />
+                                                        <NewWordpressCard key={item.id} exist={exist} item={item} />
                                                     )
                                                 })
                                             }

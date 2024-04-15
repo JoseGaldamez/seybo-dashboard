@@ -10,14 +10,19 @@ export const getNewsFromFirebase = async () => {
         const data = await response.json();
 
         const newsKeys = Object.keys(data);
+
         newsKeys.map((key) => {
             listOfNews.push({
-                id: key,
+                uuid: key,
                 ...data[key],
             });
         });
 
-        return listOfNews;
+        const listOrdened = listOfNews.sort((a, b) => {
+            return b.id - a.id;
+        });
+
+        return listOrdened;
     }
 
     return null;
@@ -39,6 +44,18 @@ export const createNewInFirebase = async (newItem: NewModel) => {
     return false;
 };
 
+export const deleteNewInFirebase = async (id: string) => {
+    const response = await fetch(`${baseURLFirebase}/news/${id}.json`, {
+        method: "DELETE",
+    });
+
+    if (response.ok) {
+        return true;
+    }
+
+    return false;
+};
+
 export const getNewsFromWordPress = async () => {
     const listOfNews: NewModel[] = [];
 
@@ -50,8 +67,11 @@ export const getNewsFromWordPress = async () => {
             listOfNews.push({
                 id: item.id,
                 title: item.title.rendered,
+                date: item.date.split("T")[0].replace(/-/g, "/"),
                 description: item.excerpt.rendered,
+                content: item.content.rendered,
                 url: item.link,
+                image: extractImageFeatured(item),
             });
         });
 
@@ -59,4 +79,16 @@ export const getNewsFromWordPress = async () => {
     }
 
     return null;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const extractImageFeatured = (item: any) => {
+    if (
+        item._embedded["wp:featuredmedia"] &&
+        item._embedded["wp:featuredmedia"][0].source_url
+    ) {
+        return item._embedded["wp:featuredmedia"][0].source_url;
+    }
+
+    return "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
 };

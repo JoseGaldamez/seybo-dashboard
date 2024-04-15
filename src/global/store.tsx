@@ -3,8 +3,11 @@ import { create } from 'zustand'
 export type Store = {
     authStatus: 'authorized' | 'unauthorized'
     username: string
+    needUpdate: boolean
     login(): void
     logout(): void
+    setNeedUpdateON(): void
+    setNeedUpdateOFF(): void
 }
 
 type Action = {
@@ -12,6 +15,7 @@ type Action = {
 }
 
 export const useStore = create<Store & Action>((set) => ({
+    needUpdate: false,
     authStatus: localStorage.getItem('authStatus') === 'authorized' ? 'authorized' : 'unauthorized',
     username: localStorage.getItem('username') || '',
     login: () => set(() => {
@@ -26,5 +30,11 @@ export const useStore = create<Store & Action>((set) => ({
     setUser: (username) => set(() => {
         localStorage.setItem('username', username);
         return { username }
+    }),
+    setNeedUpdateON: () => set(() => {
+        return { needUpdate: true }
+    }),
+    setNeedUpdateOFF: () => set(() => {
+        return { needUpdate: false }
     })
 }));
