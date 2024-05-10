@@ -5,8 +5,10 @@ export const loginUser = async (username: string, password: string) => {
     if (response.ok) {
         const user = await response.json();
 
-        if (user.pass === password) {
-            return user.name;
+        if (user.pass) {
+            if (user.pass === password) {
+                return user.name;
+            }
         }
     }
 
