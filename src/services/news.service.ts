@@ -3,6 +3,8 @@ import { NewModel } from "../models/new.mode";
 const baseURLFirebase = import.meta.env.VITE_BACKEND_URL;
 const baseURLWordPress = import.meta.env.VITE_WORDPRESS_URL;
 
+const basesIDLeft = 100000;
+
 export const getNewsFromFirebase = async () => {
     const listOfNews: NewModel[] = [];
     const response = await fetch(`${baseURLFirebase}/news.json`);
@@ -29,8 +31,10 @@ export const getNewsFromFirebase = async () => {
 };
 
 export const createNewInFirebase = async (newItem: NewModel) => {
-    const response = await fetch(`${baseURLFirebase}/news.json`, {
-        method: "POST",
+    const id = basesIDLeft - newItem.id;
+
+    const response = await fetch(`${baseURLFirebase}/news/${id}.json`, {
+        method: "PUT",
         headers: {
             "Content-Type": "application/json",
         },
