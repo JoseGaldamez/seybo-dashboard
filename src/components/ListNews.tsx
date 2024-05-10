@@ -21,7 +21,7 @@ export const ListNews = () => {
 
     const handleGetNews = async () => {
         const result = await getNewsFromFirebase();
-        console.log(result);
+
         if (result) {
             setNews(result);
         }

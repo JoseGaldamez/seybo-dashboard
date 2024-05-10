@@ -7,11 +7,8 @@ export const NewWordpressCard = ({ item, exist }: { item: NewModel, exist: boole
     const [added, setAdded] = useState(false)
 
     const handleAddToFirebase = async () => {
-        console.log("Agregado a la aplicación");
-
         const result = await createNewInFirebase(item);
         setAdded(result);
-
     }
 
     return (

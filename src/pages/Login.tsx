@@ -12,6 +12,10 @@ export const LoginPage = () => {
         const password = formData.get('password') as string
 
         const username = await loginUser(email, password);
+        if (!username) {
+            alert("Usuario o contraseña incorrectos");
+            return;
+        }
         setUser(username);
         login();
     }

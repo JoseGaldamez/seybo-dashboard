@@ -27,7 +27,7 @@ export const TitleListNews = ({ firebaseNews }: { firebaseNews: NewModel[] }) =>
 
     const handleGetNewsFromWordPress = async () => {
         const result = await getNewsFromWordPress();
-        console.log(result);
+
         if (result) {
             setNews(result);
         }
