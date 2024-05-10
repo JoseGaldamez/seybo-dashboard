@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { useStore } from "../global/store"
 import { loginUser } from "../services/auth.service.ts";
 
 export const LoginPage = () => {
     const { login, setUser } = useStore();
+    const [errorLogin, setErrorLogin] = useState(false);
 
     const handleSubmitLogin = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()
@@ -11,13 +13,20 @@ export const LoginPage = () => {
         const email = formData.get('username') as string
         const password = formData.get('password') as string
 
-        const username = await loginUser(email, password);
-        if (!username) {
-            alert("Usuario o contraseña incorrectos");
-            return;
+        try {
+            const username = await loginUser(email, password);
+            if (!username) {
+                setErrorLogin(true);
+                return;
+            }
+            setUser(username);
+            login();
+
+        } catch (error) {
+            console.log(error);
+            setErrorLogin(true);
         }
-        setUser(username);
-        login();
+
     }
 
     return (
@@ -42,12 +51,13 @@ export const LoginPage = () => {
                             </label>
                             <div className="mt-2">
                                 <input
+                                    onChange={() => setErrorLogin(false)}
                                     id="username"
                                     name="username"
                                     type="text"
                                     autoComplete="email"
                                     required
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-neutral-700 sm:text-sm sm:leading-6"
+                                    className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-neutral-700 sm:text-sm sm:leading-6 ${errorLogin ? 'ring-2 ring-red-500' : 'focus:ring-2 focus:ring-inset focus:ring-neutral-700'}`}
                                 />
                             </div>
                         </div>
@@ -60,12 +70,13 @@ export const LoginPage = () => {
                             </div>
                             <div className="mt-2">
                                 <input
+                                    onChange={() => setErrorLogin(false)}
                                     id="password"
                                     name="password"
                                     type="password"
                                     autoComplete="current-password"
                                     required
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-neutral-700 sm:text-sm sm:leading-6"
+                                    className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-neutral-700 sm:text-sm sm:leading-6 ${errorLogin ? 'ring-2 ring-red-500' : 'focus:ring-2 focus:ring-inset focus:ring-neutral-700'}`}
                                 />
                             </div>
                         </div>
